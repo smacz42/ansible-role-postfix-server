@@ -1,0 +1,30 @@
+#!/bin/bash
+# Imports data from OpenDMARC's opendmarc.dat file into a local MySQL DB
+# and sends DMARC failure reports to domain owners.
+# Based on a script from Hamzah Khan (http://blog.hamzahkhan.com/)
+
+set -e
+
+# Database and History File Info
+DBHOST='localhost'
+DBUSER={{ mysql_dbuser }}
+DBPASS={{ mysql_dbpasswd }}
+DBNAME={{ mysql_dbname }}
+
+# Make sure history file exists
+touch {{ postfix_opendmarc_HistoryFile }}.dat
+
+# Move history file temp dir for processing
+mv {{ postfix_opendmarc_HistoryFile }}.dat /tmp/opendmarc.$$
+
+# Import temp history file data and send reports
+/usr/sbin/opendmarc-import -dbhost=${DBHOST} -dbuser=${DBUSER}
+-dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose &amp;lt; /tmp/opendmarc.$$
+/usr/sbin/opendmarc-reports -dbhost=${DBHOST} -dbuser=${DBUSER}
+-dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose -interval=86400
+-report-email 'postmaster@cheatcodes.com' -report-org 'CheatCodes.com'
+/usr/sbin/opendmarc-expire -dbhost=${DBHOST} -dbuser=${DBUSER}
+-dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose
+
+# Delete temp history file
+rm -rf /tmp/opendmarc.$$

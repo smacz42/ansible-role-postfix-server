@@ -1,0 +1,35 @@
+---
+# Handler actions. This is typically a restart of a service.
+
+- name: Postmap transport
+  shell: postmap /etc/postfix/maps/transport
+
+- name: Postmap va and rr
+  shell: postmap /etc/postfix/maps/{{ item }}
+  with_items:
+    - virtual_aliases
+    - relay_recipients
+
+- name: Restart postfix
+  service:
+    name: postfix
+    state: restarted
+
+- name: Restart spamassassin services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - spamassassin
+    - spamass-milter
+    - spamass-milter-root
+
+- name: Restart opendkim
+  service:
+    name: opendkim
+    state: restarted
+
+- name: Restart opendmarc
+  service:
+    name: opendmarc
+    state: restarted

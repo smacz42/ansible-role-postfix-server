@@ -1,0 +1,21 @@
+---
+
+- name: chroot
+  - /etc/hosts && /etc/resolv.conf to /var/spool/postfix
+
+## Do these all plug into the milter?
+
+- name: DKIM
+  - EPEL
+  - yum install opendkim
+  - Keys to ClouDNS (HTTP API?)
+  - /etc/opendkim
+  - http://www.linuxtechi.com/configure-domainkeys-with-postfix-on-centos-7/
+
+- name: DMARC
+  - EPEL
+  - yum install opendmarc --enablerepo=epel-testing
+  - mysql!!!
+  - daemon service
+  - https://www.luzem.com/2015/06/20/configure-centos-7-postfix-virtual-users/
+  - http://www.stevejenkins.com/blog/2015/03/installing-opendmarc-rpm-via-yum-with-postfix-or-sendmail-for-rhel-centos-fedora/

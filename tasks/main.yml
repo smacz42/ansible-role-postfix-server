@@ -1,0 +1,20 @@
+---
+# Tasks for postfix-server
+
+- include: postfix_install.yml
+  tags: [postfix,postfix_install,install]
+
+- include: postfix_install_relay.yml
+  tags: [postfix,postfix_install,install]
+  when: "'relay' in group_names"
+
+- include: postfix_config.yml
+  tags: [postfix,postfix_config,config]
+
+- include: postfix_config_relay.yml
+  tags: [postfix,postfix_config,config]
+  when: "'relay' in group_names"
+
+- include: postfix_config_home.yml
+  tags: [postfix,postfix_config,config]
+  when: "'home' in group_names"

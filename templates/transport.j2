@@ -1,0 +1,12 @@
+{% if 'home' in group_names %}
+{{ ansible_fqdn }}      :
+{{ ansible_domain }}    :
+.{{ ansible_domain }}   :
+*                       smtp:[{{ hostvars[groups['relay'][0]]['ansible_fqdn'] }}]:2525
+{% elif 'relay' in group_names %}
+{{ ansible_domain }} smtp:[{{ hostvars[groups['home'][0]]['ansible_fqdn'] }}]:2525
+{% elif 'bups' in group_names %}
+{{ ansible_domain }}    smtp:[{{ hostvars[groups['home'][0]]['ansible_fqdn'] }}]:2525
+.{{ ansible_domain }}   smtp:[{{ hostvars[groups['home'][0]]['ansible_fqdn'] }}]:2525
+*                       smtp:[{{ hostvars[groups['relay'][0]]['ansible_fqdn'] }}]:2525
+{% endif %}

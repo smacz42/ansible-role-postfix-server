@@ -1,0 +1,104 @@
+---
+
+- name: (postfix_config_relay) [1/9] Templates /etc/postfix/maps/{virtual_aliases,relay_recipients} are deployed
+  template:
+    src: ../templates/{{ item }}.j2
+    dest: /etc/postfix/maps/{{ item }}
+    owner: root
+    group: postfix
+    mode: 0644
+  with_items:
+    - virtual_aliases
+    - relay_recipients
+  notify:
+    - Postmap va and rr
+    - Restart postfix
+
+- name: (postfix_config_relay) [2/9] Template /etc/python-policyd-spf/policyd-spf.conf is deployed
+  template:
+    src: ../templates/policyd-spf.conf.j2
+    dest: /etc/python-policyd-spf/policyd-spf.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart postfix
+
+- name: (postfix_config_relay) [3/9] Template /etc/default/spamassassin is deployed
+  template:
+    src: ../templates/spamassassin.j2
+    dest: /etc/default/spamassassin
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart spamassassin services
+
+- name: (postfix_config_relay) [4/9] Template /etc/mail/spamassassin/local.cf is deployed
+  template:
+    src: ../templates/local.cf.j2
+    dest: /etc/mail/spamassassin/local.cf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart spamassassin services
+
+- name: (postfix_config_relay) [5/9] Templates /etc/sysconfig/spamass{assin,-milter,-milter-postfix} are deployed
+  template:
+    src: ../templates/{{ item }}.j2
+    dest: /etc/sysconfig/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - spamassassin
+    - spamass-milter
+    - spamass-milter-postfix
+  notify:
+    - Restart spamassassin services
+
+- name: (postfix_config_relay) [6/9] Template /etc/opendkim.conf is deployed
+  template:
+    src: ../templates/opendkim.conf.j2
+    dest: /etc/opendkim.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart opendkim
+
+- name: (postfix_config_relay) [7/9] Templates /etc/opendkim/{KeyTable,SigningTable,TrustedHosts} are deployed
+  template:
+    src: ../templates/{{ item }}.j2
+    dest: /etc/sysconfig/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - KeyTable
+    - SigningTable
+    - TrustedHosts
+  notify:
+    - Restart opendkim
+
+- name: (postfix_config_relay) [8/9] Template /etc/opendmarc.conf is deployed
+  template:
+    src: ../templates/opendmarc.conf.j2
+    dest: /etc/opendmarc.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart opendmarc
+
+- name: (postfix_config_relay) [9/9] Template /etc/cron.hourly/processdmarc.cron and /etc/cron.weekly/wget_effective_tld_names.cron is deployed
+  template:
+    src: ../templates/{{ item.filename }}.cron.j2
+    dest: /etc/cron.{{ item.freq }}/{{ item.filename }}.cron
+    owner: root
+    group: root
+    mode: 0744
+  with_items:
+    - { freq: hourly, filename: processdmarc }
+    - { freq: weekly, filename: wget_effective_tld_names }

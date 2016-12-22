@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+debugLevel = {{ postfix_spf_debugLevel }}
+defaultSeedOnly = {{ postfix_spf_defaultSeedOnly }}
+HELO_reject = {{ postfix_spf_HELO_reject }}
+Mail_From_reject = {{ postfix_spf_Mail_From_reject }}
+PermError_reject: {{ postfix_spf_PermError_reject }}
+TempError_Defer = {{ postfix_spf_TempError_Defer }}
+skip_addresses = {{ postfix_spf_skip_addresses }}
+

@@ -1,0 +1,45 @@
+---
+
+- name: (postfix_install) [1/6] Postfix is installed
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - postfix
+    - openssl
+
+- name: (postfix_install) [2/6] Postfix is enabled
+  service:
+    name: postfix
+    enabled: yes
+
+- name: (postfix_install) [3/6] Directory /etc/ssl/private is present
+  file:
+    path: /etc/ssl/private
+    state: directory
+    owner: root
+    group: root
+    mode: 0744
+
+- name: (postfix_install) [4/6] New self-signed SSL cert/key pair is generated and deployed
+  command: openssl req -x509 -newkey rsa:4096 -nodes -subj "{{ postfix_ssl_cert_subj_string }}" -days 3650 -keyout {{ postfix_tls_key_file }} -out {{ postfix_tls_cert_file }}
+  args:
+    creates: "{{ postfix_tls_key_file }}"
+
+- name: (postfix_install) [5/6] Cert files have correct permissions
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 400
+  with_items:
+    - "{{ postfix_tls_cert_file }}"
+    - "{{ postfix_tls_key_file }}"
+
+- name: (postfix_install) [6/6] Directory /etc/postfix/maps is present
+  file:
+    path: /etc/postfix/maps
+    state: directory
+    owner: root
+    group: postfix
+    mode: 0744

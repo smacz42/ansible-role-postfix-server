@@ -1,0 +1,16 @@
+---
+
+- name: (postfix_config_home) [1/1] Files /etc/postfix/mysql-virtual-*.cf are deployed
+  template:
+    src: ../templates/mysql-virtual-{{ item }}.cf.j2
+    dest: /etc/postfix/mysql-virtual-{{ item }}.cf
+    owner: root
+    group: postfix
+    mode: 0640
+  with_items:
+    - mailbox-domains
+    - mailbox-maps
+    - alias-maps
+    - email2email
+  notify: Restart mariadb
+

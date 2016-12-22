@@ -1,0 +1,56 @@
+---
+
+- name: (postfix_install_relay) [1/6] Extra packages for 'relay' are installed
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - pypolicyd-spf
+    - opendkim
+    - opendmarc
+    - spamassassin
+    - spamass-milter-postfix
+  when: "'relay' in group_names"
+
+- name: (postfix_install_relay) [2/6] Other services are enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - spamassassin
+    - opendkim
+    - opendmarc
+  when: "'relay' in group_names"
+
+- name: (postfix_install_relay) [3/6] Directory /etc/opendkim/keys/{{ ansible_domain }} is present
+  file:
+    path: /etc/opendkim/keys/{{ ansible_domain }}/
+    state: directory
+    owner: opendkim
+    group: opendkim
+    mode: 0744
+  when: "'relay' in group_names"
+
+- name: (postfix_install_relay) [4/6] New self-signed OpenDKIM key pair is generated and deployed
+  command: opendkim-genkey -D /etc/opendkim/keys/{{ ansible_domain }}/ -d {{ ansible_domain }} -s default
+  args:
+    creates: /etc/opendkim/keys/{{ ansible_domain }}
+  when: "'relay' in group_names"
+  register: new_opendkim_keypair
+
+- name: (postfix_install_relay) [5/6] Rename OpenDKIM default keyname
+  copy:
+    remote_src: True
+    src: /etc/opendkim/keys/{{ ansible_domain }}/default.private
+    dest: /etc/opendkim/keys/{{ ansible_domain }}/default
+  when: "new_opendkim_keypair|changed and 'relay' in group_names"
+
+- name: (postfix_install_relay) [6/6] OpenDKIM keys directory has correct permissions
+  file:
+    path: /etc/opendkim/keys/{{ ansible_domain }}
+    owner: opendkim
+    group: opendkim
+    mode: 744
+    state: directory
+    recurse: yes
+  when: "'relay' in group_names"

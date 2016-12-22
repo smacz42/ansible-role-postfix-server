@@ -1,0 +1,24 @@
+---
+
+- name: (postfix_config) [1/2] Templates /etc/postfix/ma{in,ster}.cf are deployed
+  template:
+    src: ../templates/{{ item }}.cf.j2
+    dest: /etc/postfix/{{ item }}.cf
+    owner: root
+    group: postfix
+    mode: 0644
+  with_items:
+    - master
+    - main
+  notify: Restart postfix
+
+- name: (postfix_config) [2/2] Template /etc/postfix/maps/transport is deployed
+  template:
+    src: ../templates/transport.j2
+    dest: /etc/postfix/maps/transport
+    owner: root
+    group: postfix
+    mode: 0644
+  notify:
+    - Postmap transport
+    - Restart postfix
