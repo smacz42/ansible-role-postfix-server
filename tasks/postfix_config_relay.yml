@@ -1,4 +1,4 @@
--10-
+---
 
 - name: (postfix_config_relay) [1/10] Templates /etc/postfix/maps/{virtual_aliases,relay_recipients} are deployed
   template:
