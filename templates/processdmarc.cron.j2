@@ -18,13 +18,10 @@ touch {{ postfix_opendmarc_HistoryFile }}.dat
 mv {{ postfix_opendmarc_HistoryFile }}.dat /tmp/opendmarc.$$
 
 # Import temp history file data and send reports
-/usr/sbin/opendmarc-import -dbhost=${DBHOST} -dbuser=${DBUSER}
--dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose &amp;lt; /tmp/opendmarc.$$
-/usr/sbin/opendmarc-reports -dbhost=${DBHOST} -dbuser=${DBUSER}
--dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose -interval=86400
--report-email 'postmaster@cheatcodes.com' -report-org 'CheatCodes.com'
-/usr/sbin/opendmarc-expire -dbhost=${DBHOST} -dbuser=${DBUSER}
--dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose
+/usr/sbin/opendmarc-import -dbhost=${DBHOST} -dbuser=${DBUSER} -dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose < /tmp/opendmarc.$$
+/usr/sbin/opendmarc-reports -dbhost=${DBHOST} -dbuser=${DBUSER} -dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose \
+-interval=86400 -report-email 'postmaster@{{ ansible_domain }}' -report-org '{{ ansible_domain }}'
+/usr/sbin/opendmarc-expire -dbhost=${DBHOST} -dbuser=${DBUSER} -dbpasswd=${DBPASS} -dbname=${DBNAME} -verbose
 
 # Delete temp history file
 rm -rf /tmp/opendmarc.$$

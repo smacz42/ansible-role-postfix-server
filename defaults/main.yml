@@ -127,7 +127,7 @@ postfix_spf_skip_addresses: 127.0.0.0/8,::ffff:127.0.0.0/104,::1
 ############################################################################### OpenDKIM
 
 postfix_opendkim_AutoRestart: Yes
-postfix_opendkim_AutoRestartRate: 10/1hm
+postfix_opendkim_AutoRestartRate: 10/1h
 postfix_opendkim_LogWhy: Yes
 postfix_opendkim_Syslog: Yes
 postfix_opendkim_SyslogSuccess: Yes

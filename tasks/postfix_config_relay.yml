@@ -1,6 +1,6 @@
----
+-10-
 
-- name: (postfix_config_relay) [1/9] Templates /etc/postfix/maps/{virtual_aliases,relay_recipients} are deployed
+- name: (postfix_config_relay) [1/10] Templates /etc/postfix/maps/{virtual_aliases,relay_recipients} are deployed
   template:
     src: ../templates/{{ item }}.j2
     dest: /etc/postfix/maps/{{ item }}
@@ -14,7 +14,7 @@
     - Postmap va and rr
     - Restart postfix
 
-- name: (postfix_config_relay) [2/9] Template /etc/python-policyd-spf/policyd-spf.conf is deployed
+- name: (postfix_config_relay) [2/10] Template /etc/python-policyd-spf/policyd-spf.conf is deployed
   template:
     src: ../templates/policyd-spf.conf.j2
     dest: /etc/python-policyd-spf/policyd-spf.conf
@@ -24,7 +24,7 @@
   notify:
     - Restart postfix
 
-- name: (postfix_config_relay) [3/9] Template /etc/default/spamassassin is deployed
+- name: (postfix_config_relay) [3/10] Template /etc/default/spamassassin is deployed
   template:
     src: ../templates/spamassassin.j2
     dest: /etc/default/spamassassin
@@ -34,7 +34,7 @@
   notify:
     - Restart spamassassin services
 
-- name: (postfix_config_relay) [4/9] Template /etc/mail/spamassassin/local.cf is deployed
+- name: (postfix_config_relay) [4/10] Template /etc/mail/spamassassin/local.cf is deployed
   template:
     src: ../templates/local.cf.j2
     dest: /etc/mail/spamassassin/local.cf
@@ -44,7 +44,7 @@
   notify:
     - Restart spamassassin services
 
-- name: (postfix_config_relay) [5/9] Templates /etc/sysconfig/spamass{assin,-milter,-milter-postfix} are deployed
+- name: (postfix_config_relay) [5/10] Templates /etc/sysconfig/spamass{assin,-milter,-milter-postfix} are deployed
   template:
     src: ../templates/{{ item }}.j2
     dest: /etc/sysconfig/{{ item }}
@@ -58,7 +58,7 @@
   notify:
     - Restart spamassassin services
 
-- name: (postfix_config_relay) [6/9] Template /etc/opendkim.conf is deployed
+- name: (postfix_config_relay) [6/10] Template /etc/opendkim.conf is deployed
   template:
     src: ../templates/opendkim.conf.j2
     dest: /etc/opendkim.conf
@@ -68,7 +68,7 @@
   notify:
     - Restart opendkim
 
-- name: (postfix_config_relay) [7/9] Templates /etc/opendkim/{KeyTable,SigningTable,TrustedHosts} are deployed
+- name: (postfix_config_relay) [7/10] Templates /etc/opendkim/{KeyTable,SigningTable,TrustedHosts} are deployed
   template:
     src: ../templates/{{ item }}.j2
     dest: /etc/sysconfig/{{ item }}
@@ -82,7 +82,7 @@
   notify:
     - Restart opendkim
 
-- name: (postfix_config_relay) [8/9] Template /etc/opendmarc.conf is deployed
+- name: (postfix_config_relay) [8/10] Template /etc/opendmarc.conf is deployed
   template:
     src: ../templates/opendmarc.conf.j2
     dest: /etc/opendmarc.conf
@@ -92,13 +92,18 @@
   notify:
     - Restart opendmarc
 
-- name: (postfix_config_relay) [9/9] Template /etc/cron.hourly/processdmarc.cron and /etc/cron.weekly/wget_effective_tld_names.cron is deployed
-  template:
-    src: ../templates/{{ item.filename }}.cron.j2
-    dest: /etc/cron.{{ item.freq }}/{{ item.filename }}.cron
+- name: (postfix_config_relay) [9/10] File /etc/cron.weekly/wget_effective_tld_names.cron is deployed
+  copy:
+    src: ../files/wget_effective_tld_names.cron
+    dest: /etc/cron.weekly/wget_effective_tld_names.cron
     owner: root
     group: root
     mode: 0744
-  with_items:
-    - { freq: hourly, filename: processdmarc }
-    - { freq: weekly, filename: wget_effective_tld_names }
+
+- name: (postfix_config_relay) [10/10] Template /etc/cron.hourly/processdmarc.cron is deployed
+  template:
+    src: ../templates/processdmarc.cron
+    dest: /etc/cron.hourly/processdmarc.cron.j2
+    owner: root
+    group: root
+    mode: 0744
