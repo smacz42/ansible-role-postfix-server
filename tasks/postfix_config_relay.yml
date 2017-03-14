@@ -102,8 +102,8 @@
 
 - name: (postfix_config_relay) [10/10] Template /etc/cron.hourly/processdmarc.cron is deployed
   template:
-    src: ../templates/processdmarc.cron
-    dest: /etc/cron.hourly/processdmarc.cron.j2
+    src: ../templates/processdmarc.cron.j2
+    dest: /etc/cron.hourly/processdmarc.cron
     owner: root
     group: root
     mode: 0744
